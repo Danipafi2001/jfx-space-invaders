@@ -1,37 +1,37 @@
 package thread;
 
 import javafx.application.Platform;
-import javafx.scene.layout.Pane;
 import model.Sprite;
+import ui.SpaceInvadersGUI;
 
 public class TankThread extends Thread {
 
+	private SpaceInvadersGUI gui;
 	private Sprite tank;
-	private Pane pane;
 	private double layoutX;
 
-	public TankThread(Sprite t, Pane p, double l) {
-		tank = t;
-		pane = p;
-		layoutX = l;
+	public TankThread(SpaceInvadersGUI gui, Sprite tank, double layoutX) {
+		this.gui = gui;
+		this.tank = tank;
+		this.layoutX = layoutX;
 	}
-
+	
 	@Override
 	public void run() {
-		while((tank.isActiveLeft() && layoutX < 0) || (tank.isActiveRight() && layoutX >= 0)) {
+		while((tank.isMovingUpRight() && layoutX > 0) || (tank.isMovingDownLeft() && layoutX < 0) && !gui.isStop()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					if(layoutX>=0) {
-						if(tank.getLayoutX() + layoutX < pane.getWidth() - tank.getFitWidth())
-							tank.updateLayout(layoutX, 0);
+					if(layoutX>0) {
+						if(tank.getLayoutX() + layoutX < 800 - tank.getWidth())
+							tank.setLayoutX(tank.getLayoutX() + layoutX);
 						else
-							tank.updateLayout(pane.getWidth() - tank.getFitWidth() - tank.getLayoutX(), 0);
+							tank.setLayoutX(800 - tank.getWidth());
 					} else {
 						if(tank.getLayoutX() + layoutX > 0)
-							tank.updateLayout(layoutX, 0);
+							tank.setLayoutX(tank.getLayoutX() + layoutX);
 						else
-							tank.updateLayout(0, 0);
+							tank.setLayoutX(0);
 					}
 				}
 			});

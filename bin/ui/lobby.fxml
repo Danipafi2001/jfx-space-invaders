@@ -49,7 +49,7 @@
             <Insets bottom="80.0" left="40.0" right="40.0" top="40.0" />
          </VBox.margin>
       </HBox>
-      <Button mnemonicParsing="false" onAction="#startGame" style="-fx-background-color: black;" text="Start" textFill="LIME">
+      <Button mnemonicParsing="false" onAction="#startGame" style="-fx-background-color: black;" text="START" textFill="LIME">
          <font>
             <Font name="Consolas Bold" size="24.0" />
          </font>

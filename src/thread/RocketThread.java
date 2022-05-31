@@ -1,35 +1,47 @@
 package thread;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javafx.application.Platform;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import model.Sprite;
+import ui.SpaceInvadersGUI;
 
 public class RocketThread extends Thread {
 
-	private ImageView rocket;
-	private ArrayList<Sprite> invaders;
+	private SpaceInvadersGUI gui;
+	private Sprite attack;
+	private ArrayList<Sprite> enemies;
 
-	public RocketThread(ImageView r, ArrayList<Sprite> i) {
-		rocket = r;
-		invaders = i;
+	public RocketThread(SpaceInvadersGUI gui, Sprite attack, ArrayList<Sprite> enemies) {
+		this.gui = gui;
+		this.attack = attack;
+		this.enemies = enemies;
 	}
 
 	@Override
 	public void run() {
-		while(rocket.getLayoutY() > (-1 * rocket.getFitHeight())) {
+		while(attack.getLayoutY() > 0 && !attack.isImpact() && !gui.isStop()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					rocket.setLayoutY(rocket.getLayoutY() - 1);
-					for(int i = 0; i < invaders.size(); i++) {
-						if(rocket.getBoundsInParent().intersects(invaders.get(i).getBoundsInParent())) {
-							rocket.setLayoutY(-1 * rocket.getFitHeight());
-							invaders.get(i).setImage(new Image(getClass().getResourceAsStream("../explosion.gif")));
-							invaders.remove(i);
-							i = invaders.size();
+					attack.setLayoutY(attack.getLayoutY() - 1);
+					for(int i = 0; i < enemies.size() && !attack.isImpact(); i++) {
+						if(attack.getBoundsInParent().intersects(enemies.get(i).getBoundsInParent())) {
+							enemies.get(i).explosionByImpact();
+							attack.explosionByImpact();
+							enemies.get(i).explosionByImpact();
+							enemies.remove(enemies.get(i));
+							i = enemies.size();
+							gui.plusScore(10);
+						}
+					}
+					if(enemies.size() == 0) {
+						try {
+							gui.endGame();
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 					}
 				}
@@ -38,5 +50,6 @@ public class RocketThread extends Thread {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {}
 		}
+		attack.explosionByImpact();
 	}
 }

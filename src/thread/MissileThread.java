@@ -1,34 +1,35 @@
 package thread;
 
 import javafx.application.Platform;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import model.Sprite;
+import ui.SpaceInvadersGUI;
 
 public class MissileThread extends Thread {
 
-	private ImageView missile, tank;
-
-	public MissileThread(ImageView m, ImageView t) {
-		missile = m;
-		tank = t;
+	private SpaceInvadersGUI gui;
+	private Sprite missile, tank;
+	
+	public MissileThread(SpaceInvadersGUI gui, Sprite missile, Sprite tank) {
+		this.gui = gui;
+		this.missile = missile;
+		this.tank = tank;
 	}
 
 	@Override
 	public void run() {
-		while(missile.getLayoutY() < (600 + missile.getFitHeight())) {
+		while(missile.getLayoutY() < 500 && !missile.isImpact() && !gui.isStop()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
 					missile.setLayoutY(missile.getLayoutY() + 1);
 					if(missile.getBoundsInParent().intersects(tank.getBoundsInParent())) {
-						missile.setLayoutY(600 + missile.getFitHeight());
-						tank.setImage(new Image(getClass().getResourceAsStream("../explosion.gif")));
+						if(!missile.isImpact())
+							gui.lostLife(missile);
 					}
 				}
 			});
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {}
+			try { Thread.sleep(5);} catch (InterruptedException e) {}
 		}
+		missile.explosionByImpact();
 	}
 }
